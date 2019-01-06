@@ -18,7 +18,7 @@ function neverland_plot_list_load(){
 
   $sub_plots = get_posts(array(
     'category_name' => '剧情',
-    'category_not_in' => '主线剧情',
+    'category__not_in' => '主线剧情',
     'numberposts' => '-1',
   ));
 
