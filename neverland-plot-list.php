@@ -26,8 +26,12 @@ function neverland_plot_list_load(){
       echo '<li><h3 class="plot-list-title">' . $cat .'</h3></li>';
       echo '<ul class="plot_list">';
       foreach($plots as $plot){
+        $post_title = $plot->post_title;
+        if(get_post_meta($plot->ID, '自订标题')[0]){
+          $post_title = get_post_meta($plot->ID, '自订标题')[0];
+        }
         echo '<li class="plot">' .
-        '<a href="' . $plot->guid . '">' . $plot->post_title . '</a></li>';
+        '<a href="' . $plot->guid . '">' . $post_title . '</a></li>';
       }
       echo '</ul>';
     }
