@@ -11,51 +11,47 @@ Version: 0.0.1
 add_shortcode('add_plot_list', 'neverland_plot_list_load');
 
 function neverland_plot_list_load(){
-  $main_plots = get_posts(array(
-    'category_name' => '主线剧情',
-    'numberposts' => '-1',
-  ));
-
-  $sub_plots = get_posts(array(
+  $plots = get_posts(array(
     'category_name' => '剧情',
-    'category__not_in' => array(76),
     'numberposts' => '-1',
   ));
 
-  echo '<hr />';
-  echo '<h2 class="plot-list-title">主线剧情</h2>';
-  $sorted_main_plots = _neverland_plot_list_sort($main_plots);
-  foreach($sorted_main_plots as $area => $main_plots){
-    echo '<h3 class="area">' . $area . '</h3>';
-    echo '<ul class="plot_list">';
-    foreach($main_plots as $main_plot){
-      echo '<li class="plot">' .
-      '<a href="' . $main_plot->guid . '">' . $main_plot->post_title . '</a></li>';
+  $sorted_plots = _neverland_plot_list_sort($plots);
+  usort($sorted_plots, '_neverland_plot_list_sort_cat');
+
+  foreach($sorted_plots as $version => $cats){
+    echo '<h3 class="version-title">' . $version .'剧情</h3>';
+    echo '<ul class="version_list">';
+    foreach($cats as $cat => $plots){
+      echo '<li><h3 class="plot-list-title">' . $cat .'</h3></li>';
+      echo '<ul class="plot_list">';
+      foreach($plots as $plot){
+        echo '<li class="plot">' .
+        '<a href="' . $plot->guid . '">' . $plot->post_title . '</a></li>';
+      }
+      echo '</ul>';
     }
     echo '</ul>';
   }
-
-  echo '<hr />';
-
-  echo '<h2 class="plot-list-title">支线剧情</h2>';
-  echo '<ul class="plot_list">';
-  foreach($sub_plots as $sub_plot){
-    echo '<li class="plot">
-    <a href="' . $sub_plot->guid . '">' . $sub_plot->post_title . '</a></li>';
-  }
-  echo '</ul>';
 }
 
-function _neverland_plot_list_sort($main_plots){
-  $sorted_main_plots = array();
-  foreach($main_plots as $main_plot){
-    $area = get_post_meta($main_plot->ID, '地区')[0];
-    if(!isset($sorted_main_plots[$area])){
-      $sorted_main_plots[$area] = array($main_plot);
-    }else{
-      array_push($sorted_main_plots[$area], $main_plot);
+function _neverland_plot_list_sort($plots){
+  $sorted_plots = array(
+    '2.0' => array(
+      '主线' => array(),
+      '主线支干' => array(),
+      '个人支线' => array(),
+      '个人前传' => array(),
+    ),
+  );
+  foreach($plots as $plot){
+    $version = get_post_meta($plot->ID, '版本')[0];
+    $cat = get_post_meta($plot->ID, '小分类')[0];
+    if($version && $cat){
+      array_push($sorted_plots[$version][$cat], $plot);
     }
   }
-  return $sorted_main_plots;
+  return $sorted_plots;
 }
+
 ?>
